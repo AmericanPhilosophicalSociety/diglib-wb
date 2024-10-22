@@ -28,6 +28,10 @@ python3 wb.py {your-csv}.csv
 
 where {your-csv}.csv is a name of a comma-separated values file in the same directory containing Paged Content you would like to ingest into the Digital Library. See the CDS Google Drive for a template for preparing this CSV.
 
+## Sample data
+
+The CSV "workbench_template.csv" and the images provided in "for_ingest/SMs_Coll_160_001" can be used as sample data to verify that the script runs.
+
 # Outputs
 
 The script will output two files:
