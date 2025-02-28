@@ -27,6 +27,7 @@ host_path = 'http://localhost:8888'
 workbench_path = '/your/path/to/workbench'
 csv_path = '/path/to/data/folder'
 
+
 def load_csv(path):
     """Returns CSV data as list of dictionaries"""
     rows = []
@@ -35,7 +36,7 @@ def load_csv(path):
         fieldnames = csv_reader.fieldnames
         for row in csv_reader:
             rows.append(row)
-    
+
     return fieldnames, rows
 
 
@@ -56,9 +57,9 @@ def construct_path_names(base_path, path, image_no):
         file_name = f'{path}-{str(n + 1).zfill(zfill)}.tif'
         goal_path = os.path.join(base_path, path, file_name)
         paths.append(goal_path)
-    
+
     return paths
-    
+
 
 def validate_file_names(base_path, path, image_no):
     """Determines whether file names match expected output"""
@@ -96,7 +97,7 @@ def generate_rows(base_path, data, length):
                 row.update({h: ''})
         rows.append(row)
         count = count + 1
-    
+
     return rows
 
 
@@ -153,7 +154,7 @@ def cli(filename):
             row['file'] = ''
         row.pop('total_scans')
         processed_data.append(row)
-    
+
     today = datetime.today().strftime('%Y-%m-%d')
     csv_output = f'{today}.csv'
     click.echo('Writing CSV file...')
