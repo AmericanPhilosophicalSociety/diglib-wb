@@ -20,12 +20,19 @@ from datetime import datetime
 import click
 
 
-# set variables for local instance
-username = 'username'
-password = 'password'
-host_path = 'http://localhost:8888'
-workbench_path = '/your/path/to/workbench'
-csv_path = '/path/to/data/folder'
+# load environment
+with open('variables.env', 'r') as f:
+    env_vars = dict(
+        tuple(line.replace('\n', '').split('='))
+        for line in f.readlines() if not line.startswith('#')
+    )
+
+USERNAME = env_vars['USERNAME']
+PASSWORD = env_vars['PASSWORD']
+HOST = env_vars['HOST']
+WORKBENCH_PATH = env_vars['WORKBENCH_PATH']
+CSV_PATH = env_vars['CSV_PATH']
+IMAGE_VIEWER = env_vars['IMAGE_VIEWER']
 
 
 def load_csv(path):
@@ -87,7 +94,7 @@ def generate_rows(base_path, data, length):
             'id': str(count),
             'parent_id': data['id'],
             'field_weight': str(n),
-            'field_display_hints': 'Open Seadragon'
+            'field_display_hints': IMAGE_VIEWER
         }
         row = {}
         for h in headers:
@@ -105,10 +112,10 @@ def generate_yaml():
     today = datetime.today().strftime('%Y-%m-%d')
     data = {
         'task': 'create',
-        'host': host_path,
-        'username': username,
-        'password': password,
-        'input_dir': csv_path,
+        'host': HOST,
+        'username': USERNAME,
+        'password': PASSWORD,
+        'input_dir': CSV_PATH,
         'input_csv': f'{today}.csv',
         'output_csv': f'{today}_output.csv',
         'output_csv_include_input_csv': True,
@@ -125,8 +132,9 @@ def generate_yaml():
         'http_cache_storage_expire_after': 600
     }
     yaml = YAML()
-    with open(f'{workbench_path}/{today}.yml', 'w') as f:
+    with open(f'{WORKBENCH_PATH}/{today}.yml', 'w') as f:
         yaml.dump(data, f)
+
 
 # put it all together in command line script
 
@@ -136,7 +144,7 @@ def cli(filename):
     """Generate a CSV and YAML file for diglib ingest.
 
     FILENAME should be the relative path to the CSV to process."""
-    base_path = csv_path
+    base_path = CSV_PATH
     data_path = os.path.join(base_path, 'for_ingest')
     path = os.path.join(base_path, filename)
     fieldnames, data = load_csv(path)
