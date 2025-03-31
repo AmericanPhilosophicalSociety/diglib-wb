@@ -158,7 +158,7 @@ def cli(filename, image_type):
             scan_no = row['total_scans']
             validate_file_number(os.path.join(data_path, row['file']), scan_no, image_type)
             validate_file_names(data_path, row['file'], scan_no, image_type)
-            new_rows = generate_rows(data_path, row, len(data))
+            new_rows = generate_rows(data_path, row, len(data), image_type)
             data.extend(new_rows)
             row['file'] = ''
         row.pop('total_scans')
