@@ -47,40 +47,40 @@ def load_csv(path):
     return fieldnames, rows
 
 
-def validate_file_number(path, image_no):
+def validate_file_number(path, image_no, image_type):
     """Determines whether there are enough scans"""
-    files = [f for f in os.listdir(path) if f.endswith('.tif')]
+    files = [f for f in os.listdir(path) if f.endswith(f'.{image_type}')]
     if len(files) != int(image_no):
         raise ValueError(f'The number of files in {path} does not match the expected value')
 
 
-def construct_path_names(base_path, path, image_no):
+def construct_path_names(base_path, path, image_no, image_type):
     """Constructs path names from a base path"""
     paths = []
     zfill = 3
     if len(image_no) > 3:
         zfill = len(image_no)
     for n in range(0, int(image_no)):
-        file_name = f'{path}-{str(n + 1).zfill(zfill)}.tif'
+        file_name = f'{path}-{str(n + 1).zfill(zfill)}.{image_type}'
         goal_path = os.path.join(base_path, path, file_name)
         paths.append(goal_path)
 
     return paths
 
 
-def validate_file_names(base_path, path, image_no):
+def validate_file_names(base_path, path, image_no, image_type):
     """Determines whether file names match expected output"""
-    paths = construct_path_names(base_path, path, image_no)
+    paths = construct_path_names(base_path, path, image_no, image_type)
     path_to_check = os.path.join(base_path, path)
-    files = [os.path.abspath(os.path.join(path_to_check, f)) for f in os.listdir(path_to_check) if f.endswith('.tif')]
+    files = [os.path.abspath(os.path.join(path_to_check, f)) for f in os.listdir(path_to_check) if f.endswith(f'.{image_type}')]
     if set(paths) != set(files):
         raise ValueError(f'The file names in {path} do not match the expected values.')
 
 
-def generate_rows(base_path, data, length):
+def generate_rows(base_path, data, length, image_type):
     """Generate rows to append to CSV"""
     rows = []
-    paths = construct_path_names(base_path, data['file'], data['total_scans'])
+    paths = construct_path_names(base_path, data['file'], data['total_scans'], image_type)
     count = length + 1
     headers = data.keys()
     for n, p in enumerate(paths, start=1):
@@ -140,7 +140,8 @@ def generate_yaml():
 
 @click.command()
 @click.argument('filename', type=click.Path(exists=True))
-def cli(filename):
+@click.option('-i', '--image-type', default='tif')
+def cli(filename, image_type):
     """Generate a CSV and YAML file for diglib ingest.
 
     FILENAME should be the relative path to the CSV to process."""
@@ -155,8 +156,8 @@ def cli(filename):
         row = dict(row)
         if row['total_scans'] != '':
             scan_no = row['total_scans']
-            validate_file_number(os.path.join(data_path, row['file']), scan_no)
-            validate_file_names(data_path, row['file'], scan_no)
+            validate_file_number(os.path.join(data_path, row['file']), scan_no, image_type)
+            validate_file_names(data_path, row['file'], scan_no, image_type)
             new_rows = generate_rows(data_path, row, len(data))
             data.extend(new_rows)
             row['file'] = ''
