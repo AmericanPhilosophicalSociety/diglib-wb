@@ -47,6 +47,21 @@ def load_csv(path):
     return fieldnames, rows
 
 
+def get_file_type(media_type):
+    page_types = {
+        'image/tiff': 'tif',
+        'image/jpeg': 'jpg',
+        'image/jp2': 'jp2',
+        'image/png': 'png',
+    }
+
+    model = media_type.split('/')[0]
+    if model != 'image':
+        return None
+    else:
+        return page_types[media_type]
+
+
 def validate_file_number(path, image_no, image_type):
     """Determines whether there are enough scans"""
     files = [f for f in os.listdir(path) if f.endswith(f'.{image_type}')]
@@ -140,7 +155,7 @@ def generate_yaml():
 
 @click.command()
 @click.argument('filename', type=click.Path(exists=True))
-@click.option('-i', '--image-type', default='tif')
+@click.option('-i', '--image-type')
 def cli(filename, image_type):
     """Generate a CSV and YAML file for diglib ingest.
 
@@ -156,9 +171,13 @@ def cli(filename, image_type):
         row = dict(row)
         if row['total_scans'] != '':
             scan_no = row['total_scans']
-            validate_file_number(os.path.join(data_path, row['file']), scan_no, image_type)
-            validate_file_names(data_path, row['file'], scan_no, image_type)
-            new_rows = generate_rows(data_path, row, len(data), image_type)
+            if not image_type:
+                image_ext = get_file_type(row['field_internet_media_type'])
+            else:
+                image_ext = image_type
+            validate_file_number(os.path.join(data_path, row['file']), scan_no, image_ext)
+            validate_file_names(data_path, row['file'], scan_no, image_ext)
+            new_rows = generate_rows(data_path, row, len(data), image_ext)
             data.extend(new_rows)
             row['file'] = ''
         row.pop('total_scans')
