@@ -6,11 +6,12 @@ This repository contains a script to prepare data for upload to one of the APS I
 
 Set the following variables according to your local installation and user profile:
 
-- username
-- password
-- host_path
-- workbench_path
-- csv_path
+
+- `username`
+- `password`
+- `host_path`
+- `workbench_path`
+- `csv_path`
 
 Please contact an administrator or manager if you do not know the correct values.
 
@@ -24,9 +25,9 @@ Then, upload your image files and your data to the server with WinSCP. In the di
 
 The script should also be uploaded to the server at the path specified for "csv_path." Run the script through the following command:
 
-python3 wb.py {your-csv}.csv
+`python3 wb.py {your-csv}.csv`
 
-where {your-csv}.csv is a name of a comma-separated values file in the same directory containing Paged Content you would like to ingest into the Digital Library. See the CDS Google Drive for a template for preparing this CSV.
+where `{your-csv}.csv` is a name of a comma-separated values file in the same directory containing Paged Content you would like to ingest into the Digital Library. See the CDS Google Drive for a template for preparing this CSV.
 
 ## Sample data
 
